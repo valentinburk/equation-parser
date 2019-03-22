@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using EquationsParser.Logic;
 using Xunit;
 
 namespace EquationsParser.Tests

@@ -1,22 +1,23 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using EquationsParser.Contracts;
 
-namespace EquationsParser
+namespace EquationsParser.Logic
 {
-    public class StringParser
+    internal sealed class StringParser : IStringParser
     {
-        public static string[] Parse(string origin, char[] delimiters)
+        public string[] Parse(string origin, IReadOnlyCollection<char> delimiters)
         {
-            List<string> strings = new List<string>();
+            var strings = new List<string>();
 
             // Remove spaces
             origin = origin.Replace(" ", "");
 
-            int index = -1;
-            StringBuilder builder = new StringBuilder();
+            var index = -1;
+            var builder = new StringBuilder();
 
             // Store sign delimiter
-            char nextSign = '+';
+            var nextSign = '+';
             if (origin[0] == '-')
             {
                 nextSign = '-';
@@ -33,9 +34,12 @@ namespace EquationsParser
 
                 builder.Append(origin[index]);
 
-                foreach (char delimiter in delimiters)
+                foreach (var delimiter in delimiters)
                 {
-                    if (origin[index] != delimiter) continue;
+                    if (origin[index] != delimiter)
+                    {
+                        continue;
+                    }
 
                     builder.Remove(builder.Length - 1, 1);
 
@@ -43,6 +47,7 @@ namespace EquationsParser
 
                     strings.Add(builder);
                     builder.Clear();
+
                     break;
                 }
             }

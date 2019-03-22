@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using EquationsParser.Models;
 
 namespace EquationsParser
 {
-    public class TermEqualityComparer : IEqualityComparer<Term>
+    internal sealed class TermEqualityComparer : IEqualityComparer<Term>
     {
         public bool Equals(Term x, Term y)
         {

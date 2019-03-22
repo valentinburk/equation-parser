@@ -1,3 +1,4 @@
+using EquationsParser.Models;
 using Xunit;
 
 namespace EquationsParser.Tests
@@ -19,10 +20,10 @@ namespace EquationsParser.Tests
             Term result4 = Term.FromString(term4);
             Term result5 = Term.FromString(term5);
 
-            Assert.Equal(-3.5f, result1.Multiplier);
+            Assert.Equal(-3.5m, result1.Multiplier);
             Assert.Contains("x", result1.Variables);
             Assert.Contains("y^2", result1.Variables);
-            Assert.Equal(8f, result2.Multiplier);
+            Assert.Equal(8m, result2.Multiplier);
             Assert.Contains("x^9", result2.Variables);
             Assert.Contains("y^2", result2.Variables);
             Assert.Equal(12, result3.Multiplier);

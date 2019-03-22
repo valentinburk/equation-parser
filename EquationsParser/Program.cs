@@ -1,14 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using EquationsParser.Contracts;
+using EquationsParser.Logic;
+using System;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace EquationsParser
 {
     class Program
     {
-        static void Main(string[] args)
+        private static IFileReader _fileReader;
+        private static IStringParser _stringParser;
+        private static ITermParser _termParser;
+        private static ITermConverter _termConverter;
+        private static ICalculator _calculator;
+
+        static Task Main(string[] args)
         {
-            ProgramMode type = ProgramMode.NotChosen;
+            _fileReader = new FileReader();
+            _stringParser = new StringParser();
+            _termParser = new TermParser();
+            _termConverter = new TermConverter();
+            _calculator = new Calculator(_stringParser, _termParser, _termConverter);
+
+            var type = ProgramMode.NotChosen;
             string filepath = null;
 
             if (args.Length > 0)
@@ -28,10 +43,10 @@ namespace EquationsParser
                 }
             }
 
-            StartProgram(type, filepath);
+            return StartProgram(type, filepath);
         }
 
-        private static void StartProgram(ProgramMode type, string filepath)
+        private static async Task StartProgram(ProgramMode type, string filepath)
         {
             while (type == ProgramMode.NotChosen)
             {
@@ -58,16 +73,14 @@ namespace EquationsParser
                     RunInteractiveMode();
                     break;
                 case ProgramMode.FromFile:
-                    RunFileMode(filepath);
+                    await RunFileModeAsync(filepath);
                     break;
             }
         }
 
         private static void RunInteractiveMode()
         {
-            Calculator calculator = new Calculator();
-
-            bool isRunning = true;
+            var isRunning = true;
 
             Console.CancelKeyPress += (s, a) =>
             {
@@ -79,11 +92,11 @@ namespace EquationsParser
             while (isRunning)
             {
                 Console.WriteLine("Please, input your expression below:");
-                string expression = Console.ReadLine();
+                var expression = Console.ReadLine();
 
                 try
                 {
-                    string result = calculator.Calculate(expression);
+                    var result = _calculator.Calculate(expression);
                     Console.WriteLine($"Result: {result}");
                 }
                 catch (Exception)
@@ -93,37 +106,18 @@ namespace EquationsParser
             }
         }
 
-        private static void RunFileMode(string filepath)
+        private static async Task RunFileModeAsync(string filepath)
         {
-            Calculator calculator = new Calculator();
-
             while (!Path.IsPathRooted(filepath))
             {
                 Console.WriteLine("Please, provide valid path to your file (full path C:\\SomeDir\\SomeFile.txt):");
                 filepath = Console.ReadLine();
             }
 
-            List<string> calculations = new List<string>();
+            var equations = await _fileReader.ReadEquationsAsync(filepath);
+            var calculations = equations.Select(_calculator.Calculate);
 
-            string output = $"{DateTime.Now:ddMMyyyyHHmmss}.out";
-            using (var reader = new StreamReader(filepath))
-            {
-                string line;
-                while ((line = reader.ReadLine()) != null)
-                {
-                    try
-                    {
-                        string result = calculator.Calculate(line);
-                        calculations.Add(result);
-                    }
-                    catch (Exception)
-                    {
-                        Console.WriteLine($"Parsing failed. Expression is not valid: {line}");
-                    }
-                }
-            }
-
-            File.AppendAllLines(output, calculations);
+            await File.AppendAllLinesAsync($"{DateTime.Now:ddMMyyyyHHmmss}.out", calculations);
         }
     }
 }

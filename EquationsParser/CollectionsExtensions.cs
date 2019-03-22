@@ -32,13 +32,8 @@ namespace EquationsParser
             {
                 return false;
             }
-            
-            foreach (string o in originArray)
-            {
-                if (!otherArray.Contains(o, StringComparer.InvariantCultureIgnoreCase)) return false;
-            }
 
-            return true;
+            return originArray.All(o => otherArray.Contains(o, StringComparer.InvariantCultureIgnoreCase));
         }
     }
 }
