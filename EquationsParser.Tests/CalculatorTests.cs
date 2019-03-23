@@ -23,13 +23,13 @@ namespace EquationsParser.Tests
 
         private static readonly TestCaseData[] NegativeTestCases =
         {
-            new TestCaseData("x=0", "x=0"), // Already converted. Should return same result
-            new TestCaseData("16x^2+y+4z=0", "16x^2+4z+y=0"), // Already converted. Should return same result
-            new TestCaseData("x^2y=-yx^2", "2x^2y=0"), // Variables on different order. Should work correctly
-            new TestCaseData("x^2yz^8o^3=-5yo^3x^2z^8", "6x^2yz^8o^3=0"), // Variables int different order. Should work correctly
-            new TestCaseData("x^2ay^3bz^4c+2x=y^3z^4x^2abc-2x", "4x=0"), // Variables int different order. Should work correctly
-            new TestCaseData("3.5x^3.5=y^1.96", "3.5x^3.5-y^1.96=0"), // Floatint point number in power. Should work correctly
-            new TestCaseData("3.5x^-3.5=y^-1.96", "3.5x^-3.5-y^-1.96=0"), // Negative numbers in power. Should work correctly
+            new TestCaseData("x=0", "x=0"),                                 // Already converted. Should return same result
+            new TestCaseData("16x^2+y+4z=0", "16x^2+4z+y=0"),               // Already converted. Should return same result
+            new TestCaseData("x^2y=-yx^2", "2x^2y=0"),                      // Variables on different order. Should work correctly
+            new TestCaseData("x^2yz^8o^3=-5yo^3x^2z^8", "6x^2yz^8o^3=0"),   // Variables int different order. Should work correctly
+            new TestCaseData("x^2ay^3bz^4c+2x=y^3z^4x^2abc-2x", "4x=0"),    // Variables int different order. Should work correctly
+            new TestCaseData("3.5x^3.5=y^1.96", "3.5x^3.5-y^1.96=0"),       // Floatint point number in power. Should work correctly
+            new TestCaseData("3.5x^-3.5=y^-1.96", "3.5x^-3.5-y^-1.96=0"),   // Negative numbers in power. Should work correctly
         };
 
         private static readonly TestCaseData[] InvalidTestCases =
