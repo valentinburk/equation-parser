@@ -1,19 +1,34 @@
-﻿using System;
+﻿using EquationsParser.Contracts;
+using EquationsParser.Models;
+using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
-using EquationsParser.Contracts;
-using EquationsParser.Models;
+using EquationsParser.Exceptions;
 
 namespace EquationsParser.Logic
 {
     internal sealed class TermParser : ITermParser
     {
+        private readonly ILogger _logger;
+
+        public TermParser(ILogger logger)
+        {
+            _logger = logger;
+        }
+
         public Term Parse(string term)
         {
+            ValidateTerm(term);
+
+            _logger.Log(
+                TraceLevel.Info,
+                $"Start parsing term {term}");
+
             Term result;
 
             // Match and assign all variables
-            var regex = new Regex(@"[a-z](\^{1}-?[0-9]*)?");
+            var regex = new Regex(@"[a-z](\^{1}-?[0-9]*(\.[0-9]+)?)?");
             result.Variables = regex.Matches(term)
                 .Select(o => o.Value)
                 .ToArray();
@@ -34,7 +49,19 @@ namespace EquationsParser.Logic
                 multipliers.Aggregate((a, b) => a * b) :
                 1 * sign;
 
+            _logger.Log(
+                TraceLevel.Info,
+                $"Term {term} has been parsed successfully");
+
             return result;
+        }
+
+        private void ValidateTerm(string term)
+        {
+            if (string.IsNullOrWhiteSpace(term))
+            {
+                throw new InvalidEquationException("Term is empty");
+            }
         }
     }
 }

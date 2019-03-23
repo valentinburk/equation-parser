@@ -2,6 +2,7 @@
 using EquationsParser.Contracts;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 
 namespace EquationsParser.Logic
 {
@@ -19,13 +20,13 @@ namespace EquationsParser.Logic
             _outputFilepath = outputFilepath;
         }
 
-        public IEnumerable<string> GetEquations()
+        public IEnumerable<string> GetEquations(CancellationToken cancellationToken = default)
         {
             using (var reader = new StreamReader(_inputFilepath))
             {
                 var line = reader.ReadLine();
 
-                if (line is null)
+                if (line is null || cancellationToken.IsCancellationRequested)
                 {
                     yield break;
                 }

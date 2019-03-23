@@ -1,6 +1,9 @@
 ﻿using EquationsParser.Contracts;
 using EquationsParser.Logic;
 using System;
+using System.Diagnostics;
+using System.Threading;
+using EquationsParser.Exceptions;
 using EquationsParser.Models;
 
 namespace EquationsParser
@@ -9,39 +12,61 @@ namespace EquationsParser
     {
         private static Config _config;
 
+        private static ILogger _logger;
         private static ICalculator _calculator;
-        private static IEquationsHandler _equationsHandler;
+
+        private static CancellationTokenSource _cancellationSource;
 
         static void Main(string[] args)
         {
+            _cancellationSource = new CancellationTokenSource();
+
             Console.CancelKeyPress += (s, a) =>
             {
                 a.Cancel = true;
+                _cancellationSource.Cancel();
             };
 
             _config = SetProgramConfig(args);
-
-            _calculator = new Calculator(new StringParser(), new TermParser(), new TermConverter());
+            _logger = new Logger();
+            _calculator = new Calculator(
+                new StringParser(_logger),
+                new TermParser(_logger),
+                new TermConverter(_logger),
+                _logger);
             
             StartProgram();
         }
 
         private static void StartProgram()
         {
+            IEquationsHandler equationsHandler;
+
             switch (_config.ProgramMode)
             {
                 case ProgramMode.Interactive:
-                    _equationsHandler = new ConsoleEquationsHandler();
+                    equationsHandler = new ConsoleEquationsHandler();
                     break;
                 case ProgramMode.FromFile:
-                    _equationsHandler = new FileEquationsHandler(_config.InputFilepath, _config.OutputFilepath);
+                    equationsHandler = new FileEquationsHandler(_config.InputFilepath, _config.OutputFilepath);
                     break;
+                default:
+                    throw new NotSupportedException($"{_config.ProgramMode} is not supported");
             }
 
-            foreach (var equation in _equationsHandler.GetEquations())
+            foreach (var equation in equationsHandler.GetEquations(_cancellationSource.Token))
             {
-                var result = _calculator.Calculate(equation);
-                _equationsHandler.OutputResult(result);
+                try
+                {
+                    var result = _calculator.Calculate(equation);
+                    equationsHandler.OutputResult(result);
+                }
+                catch (InvalidEquationException e)
+                {
+                    _logger.Log(
+                        TraceLevel.Error,
+                        $"Equation parsing operation failed while processing {equation} ({e.Message})");
+                }
             }
         }
 
@@ -73,7 +98,7 @@ namespace EquationsParser
                 Console.WriteLine("I - interactive");
                 Console.WriteLine("F - file");
 
-                var key = Console.ReadKey();
+                var key = Console.ReadKey(true);
                 Console.WriteLine();
                 switch (key.Key)
                 {

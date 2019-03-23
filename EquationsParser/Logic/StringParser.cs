@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using EquationsParser.Contracts;
 
@@ -8,8 +9,19 @@ namespace EquationsParser.Logic
     {
         private static readonly char[] DefaultDelimiters = { '+', '-' };
 
+        private readonly ILogger _logger;
+
+        public StringParser(ILogger logger)
+        {
+            _logger = logger;
+        }
+
         public string[] Parse(string origin, IReadOnlyCollection<char> delimiters = default)
         {
+            _logger.Log(
+                TraceLevel.Info,
+                $"Start parsing expression {origin}");
+
             var strings = new List<string>();
 
             // Remove spaces
@@ -55,6 +67,10 @@ namespace EquationsParser.Logic
             }
 
             strings.Add(builder);
+
+            _logger.Log(
+                TraceLevel.Info,
+                $"Expression {origin} has been parsed into {strings.Count} terms successfully");
 
             return strings.ToArray();
         }

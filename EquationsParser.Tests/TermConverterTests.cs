@@ -3,6 +3,8 @@ using EquationsParser.Models;
 using NUnit.Framework;
 using Shouldly;
 using System;
+using EquationsParser.Contracts;
+using NSubstitute;
 
 namespace EquationsParser.Tests
 {
@@ -18,6 +20,14 @@ namespace EquationsParser.Tests
             new TestCaseData(new Term { Multiplier = -1m, Variables = new[] { "x", "y" } }, "-xy"),
             new TestCaseData(new Term { Multiplier = 4m, Variables = new string[0] }, "+4"),
         };
+
+        private ILogger _logger;
+
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
+        {
+            _logger = Substitute.For<ILogger>();
+        }
 
         [Test]
         public void Test_000_Should_create_instance()
@@ -49,7 +59,7 @@ namespace EquationsParser.Tests
 
         private TermConverter CreateInstance()
         {
-            return new TermConverter();
+            return new TermConverter(_logger);
         }
     }
 }

@@ -1,20 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using EquationsParser.Contracts;
 
 namespace EquationsParser.Logic
 {
     internal sealed class ConsoleEquationsHandler : IEquationsHandler
     {
-        public IEnumerable<string> GetEquations()
+        public IEnumerable<string> GetEquations(CancellationToken cancellationToken = default)
         {
             while (true)
             {
-                Console.WriteLine("Please, input your expression belowm or type 'exit' to close the program:");
+                Console.WriteLine("Please, input your expression below or type 'exit' to close the program:");
 
                 var line = Console.ReadLine();
 
-                if (line == "exit")
+                if (line == "exit" || cancellationToken.IsCancellationRequested)
                 {
                     yield break;
                 }

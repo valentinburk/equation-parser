@@ -2,6 +2,8 @@
 using NUnit.Framework;
 using Shouldly;
 using System;
+using EquationsParser.Contracts;
+using NSubstitute;
 
 namespace EquationsParser.Tests
 {
@@ -14,8 +16,16 @@ namespace EquationsParser.Tests
             new TestCaseData("59x^2+4.5xy-2y-4", new[] { "+59x^2", "+4.5xy", "-2y", "-4" }),
             new TestCaseData("-58x^2-xy+y+4", new[] { "-58x^2", "-xy", "+y", "+4" }),
             new TestCaseData("2x^3+3.5xy-y", new[] { "+2x^3", "+3.5xy", "-y" }),
-            new TestCaseData("x^2-2x^3", new[] { "+2x^3", "+3.5xy", "-y" }),
+            new TestCaseData("x^2-2x^3", new[] { "-2x^3", "+x^2" }),
         };
+
+        private ILogger _logger;
+
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
+        {
+            _logger = Substitute.For<ILogger>();
+        }
 
         [Test]
         public void Test_000_Should_create_instance()
@@ -47,7 +57,7 @@ namespace EquationsParser.Tests
 
         private StringParser CreateInstance()
         {
-            return new StringParser();
+            return new StringParser(_logger);
         }
     }
 }

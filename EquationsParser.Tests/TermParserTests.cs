@@ -21,6 +21,14 @@ namespace EquationsParser.Tests
             new TestCaseData("4", new Term { Multiplier = 4m, Variables = new string[0] }),
         };
 
+        private ILogger _logger;
+
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
+        {
+            _logger = Substitute.For<ILogger>();
+        }
+
         [Test]
         public void Test_000_Should_create_instance()
         {
@@ -51,7 +59,7 @@ namespace EquationsParser.Tests
 
         private TermParser CreateInstance()
         {
-            return new TermParser();
+            return new TermParser(_logger);
         }
     }
 }

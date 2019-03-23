@@ -15,7 +15,7 @@ namespace EquationsParser.Tests
             new TestCaseData(new[] { "a", "b", "c" }, new[] { "c", "a", "b" }),
         };
 
-        private static readonly TestCaseData[] NegativeTestCases =
+        private static readonly TestCaseData[] InvalidTestCases =
         {
             new TestCaseData(new[] { "a", "b", "c" }, new[] { "a", "b", "b" }),
             new TestCaseData(new[] { "a", "b", "c" }, new[] { "c", "a" }),
@@ -62,7 +62,7 @@ namespace EquationsParser.Tests
         }
 
         [Test]
-        [TestCaseSource(nameof(NegativeTestCases))]
+        [TestCaseSource(nameof(InvalidTestCases))]
         public void Test_120_EqualsInside_NotEquals_ShouldBeFalse(string[] first, string[] second)
         {
             // Arrange & Act
