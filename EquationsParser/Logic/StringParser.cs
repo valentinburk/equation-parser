@@ -50,7 +50,7 @@ namespace EquationsParser.Logic
 
                 foreach (var delimiter in delimiters ?? DefaultDelimiters)
                 {
-                    if (origin[index] != delimiter)
+                    if (origin[index] != delimiter || origin[index - 1] == '^')
                     {
                         continue;
                     }

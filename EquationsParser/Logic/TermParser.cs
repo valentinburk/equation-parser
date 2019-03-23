@@ -10,10 +10,12 @@ namespace EquationsParser.Logic
 {
     internal sealed class TermParser : ITermParser
     {
+        private readonly IVariableParser _variableParser;
         private readonly ILogger _logger;
 
-        public TermParser(ILogger logger)
+        public TermParser(IVariableParser variableParser, ILogger logger)
         {
+            _variableParser = variableParser;
             _logger = logger;
         }
 
@@ -28,9 +30,9 @@ namespace EquationsParser.Logic
             Term result;
 
             // Match and assign all variables
-            var regex = new Regex(@"[a-z](\^{1}-?[0-9]*(\.[0-9]+)?)?");
+            var regex = new Regex(@"[a-z](\^{1}-?[0-9]*(-?\.[0-9]+)?)?");
             result.Variables = regex.Matches(term)
-                .Select(o => o.Value)
+                .Select(o => _variableParser.Parse(o.Value))
                 .ToArray();
 
             // Match multipliers

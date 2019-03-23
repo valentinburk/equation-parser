@@ -29,6 +29,7 @@ namespace EquationsParser.Tests
             new TestCaseData("x^2yz^8o^3=-5yo^3x^2z^8", "6x^2yz^8o^3=0"), // Variables int different order. Should work correctly
             new TestCaseData("x^2ay^3bz^4c+2x=y^3z^4x^2abc-2x", "4x=0"), // Variables int different order. Should work correctly
             new TestCaseData("3.5x^3.5=y^1.96", "3.5x^3.5-y^1.96=0"), // Floatint point number in power. Should work correctly
+            new TestCaseData("3.5x^-3.5=y^-1.96", "3.5x^-3.5-y^-1.96=0"), // Negative numbers in power. Should work correctly
         };
 
         private static readonly TestCaseData[] InvalidTestCases =
@@ -43,6 +44,7 @@ namespace EquationsParser.Tests
         };
 
         private ILogger _logger;
+        private IVariableParser _variableParser;
         private IStringParser _stringParser;
         private ITermParser _termParser;
         private ITermConverter _termConverter;
@@ -52,8 +54,9 @@ namespace EquationsParser.Tests
         {
             _logger = Substitute.For<ILogger>();
 
+            _variableParser = new VariableParser(_logger);
             _stringParser = new StringParser(_logger);
-            _termParser = new TermParser(_logger);
+            _termParser = new TermParser(_variableParser, _logger);
             _termConverter = new TermConverter(_logger);
         }
 

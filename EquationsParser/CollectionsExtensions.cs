@@ -12,23 +12,19 @@ namespace EquationsParser
             list.Add(builder.ToString().Trim());
         }
 
-        public static bool EqualsInside(this IEnumerable<string> origin, IEnumerable<string> other)
+        public static bool EqualsInside<T>(this IEnumerable<T> origin, IEnumerable<T> other)
+            where T : IEquatable<T>
         {
             if (origin == null || other == null)
             {
                 return false;
             }
 
-            // Enumerate once
             var originArray = origin.ToArray();
             var otherArray = other.ToArray();
 
-            if (originArray.Length != otherArray.Length)
-            {
-                return false;
-            }
-
-            return originArray.All(o => otherArray.Contains(o, StringComparer.InvariantCultureIgnoreCase));
+            return originArray.Length == otherArray.Length &&
+                   originArray.All(otherArray.Contains);
         }
     }
 }

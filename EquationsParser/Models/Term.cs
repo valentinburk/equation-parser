@@ -6,7 +6,7 @@ namespace EquationsParser.Models
     {
         public decimal Multiplier;
 
-        public string[] Variables;
+        public Variable[] Variables;
 
         public static Term operator+ (Term a, Term b)
         {

@@ -2,6 +2,7 @@
 using EquationsParser.Logic;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using EquationsParser.Exceptions;
 using EquationsParser.Models;
@@ -31,7 +32,7 @@ namespace EquationsParser
             _logger = new Logger();
             _calculator = new Calculator(
                 new StringParser(_logger),
-                new TermParser(_logger),
+                new TermParser(new VariableParser(_logger), _logger),
                 new TermConverter(_logger),
                 _logger);
             
@@ -107,6 +108,7 @@ namespace EquationsParser
                         break;
                     case ConsoleKey.F:
                         mode = ProgramMode.FromFile;
+                        filepath = SetInputFilename(args);
                         break;
                 }
             }
@@ -116,6 +118,27 @@ namespace EquationsParser
                 ProgramMode = mode,
                 InputFilepath = filepath,
             };
+        }
+
+        private static string SetInputFilename(string[] args)
+        {
+            string filepath = default;
+
+            while (filepath == default)
+            {
+                Console.WriteLine("Please, provide valid file path");
+
+                filepath = Console.ReadLine();
+
+                if (!File.Exists(filepath))
+                {
+                    Console.WriteLine($"Provided file doesn't exist");
+
+                    filepath = default;
+                }
+            }
+
+            return filepath;
         }
     }
 }

@@ -18,7 +18,8 @@ namespace EquationsParser.Tests
         private static readonly TestCaseData[] InvalidTestCases =
         {
             new TestCaseData(new[] { "a", "b", "c" }, new[] { "a", "b", "b" }),
-            new TestCaseData(new[] { "a", "b", "c" }, new[] { "c", "a" }),
+            new TestCaseData(new[] { "a", "b", "c" }, new[] { "a", "b", "b" }),
+            new TestCaseData(new[] { "a", "a", "c" }, new[] { "a", "c" }),
         };
 
         [Test]

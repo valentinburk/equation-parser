@@ -13,12 +13,12 @@ namespace EquationsParser.Tests
     {
         private static readonly TestCaseData[] TestCases =
         {
-            new TestCaseData(new Term { Multiplier = 1m, Variables = new[] { "x^2" } }, "+x^2"),
-            new TestCaseData(new Term { Multiplier = 3.5m, Variables = new[] { "x", "y" } }, "+3.5xy"),
-            new TestCaseData(new Term { Multiplier = -1m, Variables = new[] { "y" } }, "-y"),
-            new TestCaseData(new Term { Multiplier = -58m, Variables = new[] { "x^2" } }, "-58x^2"),
-            new TestCaseData(new Term { Multiplier = -1m, Variables = new[] { "x", "y" } }, "-xy"),
-            new TestCaseData(new Term { Multiplier = 4m, Variables = new string[0] }, "+4"),
+            new TestCaseData(new Term { Multiplier = 1m, Variables = new[] { new Variable('x', 2),  } }, "+x^2"),
+            new TestCaseData(new Term { Multiplier = 3.5m, Variables = new[] { new Variable('x'), new Variable('y') } }, "+3.5xy"),
+            new TestCaseData(new Term { Multiplier = -1m, Variables = new[] { new Variable('y') } }, "-y"),
+            new TestCaseData(new Term { Multiplier = -58m, Variables = new[] { new Variable('x', 2) } }, "-58x^2"),
+            new TestCaseData(new Term { Multiplier = -1m, Variables = new[] { new Variable('x'), new Variable('y') } }, "-xy"),
+            new TestCaseData(new Term { Multiplier = 4m, Variables = new Variable[0] }, "+4"),
         };
 
         private ILogger _logger;

@@ -11,21 +11,27 @@ namespace EquationsParser.Tests
     [TestFixture]
     internal sealed class TermParserTests
     {
+        private static readonly Variable FakeValidVariable = new Variable('x');
         private static readonly TestCaseData[] TestCases =
         {
-            new TestCaseData("x^2", new Term { Multiplier = 1m, Variables = new[] { "x^2" } }),
-            new TestCaseData("3.5xy", new Term { Multiplier = 3.5m, Variables = new[] { "x", "y" } }),
-            new TestCaseData("-y", new Term { Multiplier = -1m, Variables = new[] { "y" } }),
-            new TestCaseData("-58x^2", new Term { Multiplier = -58m, Variables = new[] { "x^2" } }),
-            new TestCaseData("-xy", new Term { Multiplier = -1m, Variables = new[] { "x", "y" } }),
-            new TestCaseData("4", new Term { Multiplier = 4m, Variables = new string[0] }),
+            new TestCaseData("x^2", new Term { Multiplier = 1m, Variables = new[] { FakeValidVariable } }),
+            new TestCaseData("3.5xy", new Term { Multiplier = 3.5m, Variables = new[] { FakeValidVariable, FakeValidVariable } }),
+            new TestCaseData("-y", new Term { Multiplier = -1m, Variables = new[] { FakeValidVariable } }),
+            new TestCaseData("-58x^2", new Term { Multiplier = -58m, Variables = new[] { FakeValidVariable } }),
+            new TestCaseData("-xy", new Term { Multiplier = -1m, Variables = new[] { FakeValidVariable, FakeValidVariable } }),
+            new TestCaseData("4", new Term { Multiplier = 4m, Variables = new Variable[0] }),
         };
 
+        private IVariableParser _variableParser;
         private ILogger _logger;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
+            _variableParser = Substitute.For<IVariableParser>();
+            _variableParser.Parse(Arg.Any<string>())
+                .Returns(FakeValidVariable);
+
             _logger = Substitute.For<ILogger>();
         }
 
@@ -59,7 +65,7 @@ namespace EquationsParser.Tests
 
         private TermParser CreateInstance()
         {
-            return new TermParser(_logger);
+            return new TermParser(_variableParser, _logger);
         }
     }
 }
