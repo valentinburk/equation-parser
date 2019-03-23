@@ -19,7 +19,7 @@ namespace EquationsParser.Logic
                 .ToArray();
 
             // Match multipliers
-            regex = new Regex(@"([^^]-?[0-9]+(\.[0-9]+)?)+");
+            regex = new Regex(@"^([-+]?[0-9]+(\.[0-9]+)?)+");
             var multipliers = regex.Matches(term)
                 .Select(o => Convert.ToDecimal(o.Value))
                 .ToArray();

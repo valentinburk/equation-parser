@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using EquationsParser.Contracts;
 using EquationsParser.Models;
 
@@ -16,12 +17,14 @@ namespace EquationsParser.Logic
 
             var builder = new StringBuilder();
 
-            if (term.Multiplier > 0)
+            builder.Append(term.Multiplier > 0 ? '+' : '-');
+
+            var absMultiplier = Math.Abs(term.Multiplier);
+            if (absMultiplier != 1)
             {
-                builder.Append('+');
+                builder.Append(absMultiplier);
             }
 
-            builder.Append(term.Multiplier);
             builder.Append(string.Join("", term.Variables));
 
             return builder.ToString();

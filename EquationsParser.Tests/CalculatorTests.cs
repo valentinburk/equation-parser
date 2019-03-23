@@ -9,9 +9,10 @@ namespace EquationsParser.Tests
     [TestFixture]
     internal sealed class CalculatorTests
     {
-        private static TestCaseData[] _testCases =
+        private static readonly TestCaseData[] TestCases =
         {
             new TestCaseData("x^2+3.5xy-y=-58x^2-xy+y+4", "59x^2+4.5xy-2y-4=0"), 
+            new TestCaseData("x^2+3.5xy-y=2x^3+3.5xy-y", "-2x^3+x^2=0"), 
             //new TestCaseData("", ""), 
             //new TestCaseData("", ""), 
             //new TestCaseData("", ""), 
@@ -45,7 +46,7 @@ namespace EquationsParser.Tests
         }
 
         [Test]
-        [TestCaseSource(nameof(_testCases))]
+        [TestCaseSource(nameof(TestCases))]
         public void Test_010_Calculate_ShouldReturnCorrectValue(string equation, string expectedResult)
         {
             // Arrange

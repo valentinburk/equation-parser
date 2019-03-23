@@ -6,7 +6,9 @@ namespace EquationsParser.Logic
 {
     internal sealed class StringParser : IStringParser
     {
-        public string[] Parse(string origin, IReadOnlyCollection<char> delimiters)
+        private static readonly char[] DefaultDelimiters = { '+', '-' };
+
+        public string[] Parse(string origin, IReadOnlyCollection<char> delimiters = default)
         {
             var strings = new List<string>();
 
@@ -34,7 +36,7 @@ namespace EquationsParser.Logic
 
                 builder.Append(origin[index]);
 
-                foreach (var delimiter in delimiters)
+                foreach (var delimiter in delimiters ?? DefaultDelimiters)
                 {
                     if (origin[index] != delimiter)
                     {

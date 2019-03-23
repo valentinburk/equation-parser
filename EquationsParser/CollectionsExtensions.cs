@@ -23,11 +23,6 @@ namespace EquationsParser
             var originArray = origin.ToArray();
             var otherArray = other.ToArray();
 
-            if (!originArray.Any() || !otherArray.Any())
-            {
-                return false;
-            }
-
             if (originArray.Length != otherArray.Length)
             {
                 return false;

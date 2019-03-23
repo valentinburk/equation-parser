@@ -1,40 +1,64 @@
 ﻿using EquationsParser.Contracts;
 using EquationsParser.Logic;
 using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+using EquationsParser.Models;
 
 namespace EquationsParser
 {
-    class Program
+    internal sealed class Program
     {
-        private static IFileReader _fileReader;
-        private static IStringParser _stringParser;
-        private static ITermParser _termParser;
-        private static ITermConverter _termConverter;
+        private static Config _config;
+
         private static ICalculator _calculator;
+        private static IEquationsHandler _equationsHandler;
 
-        static Task Main(string[] args)
+        static void Main(string[] args)
         {
-            _fileReader = new FileReader();
-            _stringParser = new StringParser();
-            _termParser = new TermParser();
-            _termConverter = new TermConverter();
-            _calculator = new Calculator(_stringParser, _termParser, _termConverter);
+            Console.CancelKeyPress += (s, a) =>
+            {
+                a.Cancel = true;
+            };
 
-            var type = ProgramMode.NotChosen;
-            string filepath = null;
+            _config = SetProgramConfig(args);
+
+            _calculator = new Calculator(new StringParser(), new TermParser(), new TermConverter());
+            
+            StartProgram();
+        }
+
+        private static void StartProgram()
+        {
+            switch (_config.ProgramMode)
+            {
+                case ProgramMode.Interactive:
+                    _equationsHandler = new ConsoleEquationsHandler();
+                    break;
+                case ProgramMode.FromFile:
+                    _equationsHandler = new FileEquationsHandler(_config.InputFilepath, _config.OutputFilepath);
+                    break;
+            }
+
+            foreach (var equation in _equationsHandler.GetEquations())
+            {
+                var result = _calculator.Calculate(equation);
+                _equationsHandler.OutputResult(result);
+            }
+        }
+
+        private static Config SetProgramConfig(string[] args)
+        {
+            var mode = ProgramMode.NotChosen;
+            string filepath = default;
 
             if (args.Length > 0)
             {
                 switch (args[0])
                 {
                     case "-I":
-                        type = ProgramMode.Interactive;
+                        mode = ProgramMode.Interactive;
                         break;
                     case "-F":
-                        type = ProgramMode.FromFile;
+                        mode = ProgramMode.FromFile;
                         if (args.Length > 1)
                         {
                             filepath = args[1];
@@ -43,12 +67,7 @@ namespace EquationsParser
                 }
             }
 
-            return StartProgram(type, filepath);
-        }
-
-        private static async Task StartProgram(ProgramMode type, string filepath)
-        {
-            while (type == ProgramMode.NotChosen)
+            while (mode == ProgramMode.NotChosen)
             {
                 Console.WriteLine("Please, choose program mode:");
                 Console.WriteLine("I - interactive");
@@ -59,65 +78,19 @@ namespace EquationsParser
                 switch (key.Key)
                 {
                     case ConsoleKey.I:
-                        type = ProgramMode.Interactive;
+                        mode = ProgramMode.Interactive;
                         break;
                     case ConsoleKey.F:
-                        type = ProgramMode.FromFile;
+                        mode = ProgramMode.FromFile;
                         break;
                 }
             }
 
-            switch (type)
+            return new Config
             {
-                case ProgramMode.Interactive:
-                    RunInteractiveMode();
-                    break;
-                case ProgramMode.FromFile:
-                    await RunFileModeAsync(filepath);
-                    break;
-            }
-        }
-
-        private static void RunInteractiveMode()
-        {
-            var isRunning = true;
-
-            Console.CancelKeyPress += (s, a) =>
-            {
-                Console.WriteLine("as");
-                isRunning = false;
-                a.Cancel = true;
+                ProgramMode = mode,
+                InputFilepath = filepath,
             };
-
-            while (isRunning)
-            {
-                Console.WriteLine("Please, input your expression below:");
-                var expression = Console.ReadLine();
-
-                try
-                {
-                    var result = _calculator.Calculate(expression);
-                    Console.WriteLine($"Result: {result}");
-                }
-                catch (Exception)
-                {
-                    Console.WriteLine($"Parsing failed. Expression is not valid: {expression}");
-                }
-            }
-        }
-
-        private static async Task RunFileModeAsync(string filepath)
-        {
-            while (!Path.IsPathRooted(filepath))
-            {
-                Console.WriteLine("Please, provide valid path to your file (full path C:\\SomeDir\\SomeFile.txt):");
-                filepath = Console.ReadLine();
-            }
-
-            var equations = await _fileReader.ReadEquationsAsync(filepath);
-            var calculations = equations.Select(_calculator.Calculate);
-
-            await File.AppendAllLinesAsync($"{DateTime.Now:ddMMyyyyHHmmss}.out", calculations);
         }
     }
 }

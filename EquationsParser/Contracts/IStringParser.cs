@@ -4,6 +4,6 @@ namespace EquationsParser.Contracts
 {
     public interface IStringParser
     {
-        string[] Parse(string origin, IReadOnlyCollection<char> delimiters);
+        string[] Parse(string origin, IReadOnlyCollection<char> delimiters = default);
     }
 }

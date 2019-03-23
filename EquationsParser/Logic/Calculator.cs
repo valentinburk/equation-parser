@@ -7,8 +7,6 @@ namespace EquationsParser.Logic
 {
     internal sealed class Calculator : ICalculator
     {
-        private static readonly char[] Delimiters = { '+', '-' };
-
         private readonly IStringParser _stringParser;
         private readonly ITermParser _termParser;
         private readonly ITermConverter _termConverter;
@@ -32,11 +30,11 @@ namespace EquationsParser.Logic
             var sides = equation.Split("=");
 
             var leftSide = _stringParser
-                .Parse(sides[0], Delimiters)
+                .Parse(sides[0])
                 .Select(_termParser.Parse);
 
             var rightSide = _stringParser
-                .Parse(sides[1], Delimiters)
+                .Parse(sides[1])
                 .Select(_termParser.Parse);
 
             // Add left side terms to resulting list
@@ -81,11 +79,7 @@ namespace EquationsParser.Logic
             {
                 var added = result.Single(o => o.Variables.EqualsInside(term.Variables));
                 result.Remove(added);
-                result.Add(new Term
-                {
-                    Multiplier = added.Multiplier + term.Multiplier,
-                    Variables = added.Variables,
-                });
+                result.Add(added + term);
             }
             else
             {
