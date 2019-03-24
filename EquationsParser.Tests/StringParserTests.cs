@@ -55,9 +55,7 @@ namespace EquationsParser.Tests
             result.EqualsInside(expectedResult).ShouldBeTrue();
         }
 
-        private StringParser CreateInstance()
-        {
-            return new StringParser(_logger);
-        }
+        private StringParser CreateInstance() =>
+            new StringParser(_logger);
     }
 }

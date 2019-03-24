@@ -1,107 +1,50 @@
-﻿using EquationsParser.Contracts;
-using EquationsParser.Logic;
+﻿using EquationsParser.Logic;
+using EquationsParser.Models;
 using System;
-using System.Collections.Concurrent;
-using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using EquationsParser.Exceptions;
-using EquationsParser.Models;
 
 namespace EquationsParser
 {
     internal sealed class Program
     {
-        private static Config _config;
-
-        private static ILogger _logger;
-        private static ICalculator _calculator;
-
-        private static BlockingCollection<string> _equationsToProcess;
-
-        private static CancellationTokenSource _cancellationSource;
-
         static async Task Main(string[] args)
         {
-            _cancellationSource = new CancellationTokenSource();
+            var cancellationSource = new CancellationTokenSource();
 
             Console.CancelKeyPress += (s, a) =>
             {
                 a.Cancel = true;
-                _cancellationSource.Cancel();
+                cancellationSource.Cancel();
             };
 
-            _config = SetProgramConfig(args);
-            _logger = new Logger();
-            _calculator = new Calculator(
-                new StringParser(_logger),
-                new TermParser(new VariableParser(_logger), _logger),
-                new TermConverter(_logger),
-                _logger);
+            var config = SetProgramConfig(args);
+            var logger = new Logger();
+            var calculator = new Calculator(
+                new StringParser(logger),
+                new TermParser(new VariableParser(logger), logger),
+                new TermConverter(logger),
+                logger);
 
-            _equationsToProcess = new BlockingCollection<string>();
-            
-            await RunApp();
-        }
-
-        private static Task RunApp()
-        {
-            IEquationsHandler equationsHandler;
-
-            switch (_config.ProgramMode)
-            {
-                case ProgramMode.Interactive:
-                    equationsHandler = new ConsoleEquationsHandler();
-                    break;
-                case ProgramMode.FromFile:
-                    equationsHandler = new FileEquationsHandler(_config.InputFilepath, _config.OutputFilepath);
-                    break;
-                default:
-                    throw new NotSupportedException($"{_config.ProgramMode} is not supported");
-            }
-
-            _ = Task.Run(() =>
-            {
-                foreach (var equation in equationsHandler.GetEquations(_cancellationSource.Token))
+            var appRunner = new AppRunner(
+                config,
+                calculator,
+                cfg =>
                 {
-                    _equationsToProcess.Add(equation);
-                }
-
-                _equationsToProcess.CompleteAdding();
-            });
-
-            return ProcessEquations(equationsHandler);
-        }
-
-        private static Task ProcessEquations(IEquationsHandler equationsHandler)
-        {
-            return Task.Run(async () =>
-            {
-                using (equationsHandler)
-                {
-                    foreach (var equation in _equationsToProcess.GetConsumingEnumerable())
+                    switch (cfg.ProgramMode)
                     {
-                        try
-                        {
-                            var result = _calculator.Calculate(equation);
-                            await equationsHandler.OutputResultAsync(result);
-                        }
-                        catch (InvalidEquationException e)
-                        {
-                            _logger.Log(
-                                TraceLevel.Error,
-                                $"Equation parsing operation failed while processing {equation} ({e.Message})");
-                        }
-
-                        if (_equationsToProcess.IsCompleted &&
-                            _equationsToProcess.IsAddingCompleted)
-                        {
-                            break;
-                        }
+                        case ProgramMode.Interactive:
+                            return new ConsoleEquationsHandler();
+                        case ProgramMode.FromFile:
+                            return new FileEquationsHandler(cfg.InputFilepath, cfg.OutputFilepath);
+                        default:
+                            throw new NotSupportedException($"{cfg.ProgramMode} is not supported");
                     }
-                }
-            });
+                },
+                logger);
+
+            await appRunner.RunAppAsync(cancellationSource.Token);
         }
 
         private static Config SetProgramConfig(string[] args)

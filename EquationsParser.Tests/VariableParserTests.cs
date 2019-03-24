@@ -55,9 +55,7 @@ namespace EquationsParser.Tests
             result.ShouldBe(expectedResult);
         }
 
-        private VariableParser CreateInstance()
-        {
-            return new VariableParser(_logger);
-        }
+        private VariableParser CreateInstance() =>
+            new VariableParser(_logger);
     }
 }

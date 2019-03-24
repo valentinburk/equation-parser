@@ -63,9 +63,7 @@ namespace EquationsParser.Tests
             result.ShouldBe(expectedResult);
         }
 
-        private TermParser CreateInstance()
-        {
-            return new TermParser(_variableParser, _logger);
-        }
+        private TermParser CreateInstance() =>
+            new TermParser(_variableParser, _logger);
     }
 }

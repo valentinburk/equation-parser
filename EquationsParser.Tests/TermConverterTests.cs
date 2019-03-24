@@ -57,9 +57,7 @@ namespace EquationsParser.Tests
             result.ShouldBe(expectedResult);
         }
 
-        private TermConverter CreateInstance()
-        {
-            return new TermConverter(_logger);
-        }
+        private TermConverter CreateInstance() =>
+            new TermConverter(_logger);
     }
 }

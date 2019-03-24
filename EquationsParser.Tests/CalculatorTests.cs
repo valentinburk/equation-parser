@@ -116,9 +116,7 @@ namespace EquationsParser.Tests
             Should.Throw<InvalidEquationException>(action);
         }
 
-        private Calculator CreateInstance()
-        {
-            return new Calculator(_stringParser, _termParser, _termConverter, _logger);
-        }
+        private Calculator CreateInstance() =>
+            new Calculator(_stringParser, _termParser, _termConverter, _logger);
     }
 }
