@@ -44,7 +44,10 @@ namespace EquationsParser
                 },
                 logger);
 
-            await appRunner.RunAppAsync(cancellationSource.Token);
+            using (appRunner)
+            {
+                await appRunner.RunAppAsync(cancellationSource.Token);
+            }
         }
 
         private static Config SetProgramConfig(string[] args)

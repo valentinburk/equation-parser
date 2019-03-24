@@ -10,11 +10,10 @@ using EquationsParser.Models;
 
 namespace EquationsParser.Logic
 {
-    internal sealed class AppRunner : IAppRunner
+    internal sealed class AppRunner : IAppRunner, IDisposable
     {
-        private readonly Config _config;
         private readonly ICalculator _calculator;
-        private readonly Func<Config, IEquationsHandler> _equationsHandlerFactory;
+        private readonly IEquationsHandler _equationsHandler;
         private readonly ILogger _logger;
 
         private readonly BlockingCollection<string> _equationsToProcess;
@@ -30,9 +29,8 @@ namespace EquationsParser.Logic
             EnsureArg.IsNotNull(equationsHandlerFactory, nameof(equationsHandlerFactory));
             EnsureArg.IsNotNull(logger, nameof(logger));
 
-            _config = config;
             _calculator = calculator;
-            _equationsHandlerFactory = equationsHandlerFactory;
+            _equationsHandler = equationsHandlerFactory(config);
             _logger = logger;
 
             _equationsToProcess = new BlockingCollection<string>();
@@ -40,11 +38,9 @@ namespace EquationsParser.Logic
 
         public Task RunAppAsync(CancellationToken cancellationToken = default)
         {
-            var equationsHandler = _equationsHandlerFactory(_config);
-
             _ = Task.Run(() =>
             {
-                foreach (var equation in equationsHandler.GetEquations(cancellationToken))
+                foreach (var equation in _equationsHandler.GetEquations(cancellationToken))
                 {
                     _equationsToProcess.Add(equation, CancellationToken.None);
                 }
@@ -52,37 +48,40 @@ namespace EquationsParser.Logic
                 _equationsToProcess.CompleteAdding();
             }, CancellationToken.None);
 
-            return ProcessEquationsAsync(equationsHandler);
+            return ProcessEquationsAsync();
         }
 
-        private Task ProcessEquationsAsync(IEquationsHandler equationsHandler)
+        private Task ProcessEquationsAsync()
         {
             return Task.Run(async () =>
             {
-                using (equationsHandler)
+                foreach (var equation in _equationsToProcess.GetConsumingEnumerable())
                 {
-                    foreach (var equation in _equationsToProcess.GetConsumingEnumerable())
+                    try
                     {
-                        try
-                        {
-                            var result = _calculator.Calculate(equation);
-                            await equationsHandler.OutputResultAsync(result);
-                        }
-                        catch (InvalidEquationException e)
-                        {
-                            _logger.Log(
-                                TraceLevel.Error,
-                                $"Equation parsing operation failed while processing {equation} ({e.Message})");
-                        }
+                        var result = _calculator.Calculate(equation);
+                        await _equationsHandler.OutputResultAsync(result);
+                    }
+                    catch (InvalidEquationException e)
+                    {
+                        _logger.Log(
+                            TraceLevel.Error,
+                            $"Equation parsing operation failed while processing {equation} ({e.Message})");
+                    }
 
-                        if (_equationsToProcess.IsCompleted &&
-                            _equationsToProcess.IsAddingCompleted)
-                        {
-                            break;
-                        }
+                    if (_equationsToProcess.IsCompleted &&
+                        _equationsToProcess.IsAddingCompleted)
+                    {
+                        break;
                     }
                 }
             });
+        }
+
+        public void Dispose()
+        {
+            _equationsHandler?.Dispose();
+            _equationsToProcess?.Dispose();
         }
     }
 }
