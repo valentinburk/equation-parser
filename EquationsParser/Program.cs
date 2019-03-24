@@ -86,7 +86,9 @@ namespace EquationsParser
             return new Config
             {
                 ProgramMode = mode,
-                InputFilepath = SetInputFilename(args),
+                InputFilepath = mode == ProgramMode.FromFile ?
+                    SetInputFilename(args) :
+                    default,
             };
         }
 

@@ -20,8 +20,8 @@ namespace EquationsParser.Tests
 
         private readonly Dictionary<string, string> _equationsResults = new Dictionary<string, string>
         {
-            { "a", "b" },
-            { "c", "d" },
+            { "a=b", "a-b=0" },
+            { "c=d", "c-d=0" },
         };
 
         [OneTimeSetUp]

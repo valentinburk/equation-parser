@@ -13,6 +13,7 @@ namespace EquationsParser.Tests
     {
         private static readonly TestCaseData[] PositiveTestCases =
         {
+            new TestCaseData("25+2x=25+x", "x=0"),
             new TestCaseData("x^2+3.5xy-y=-58x^2-xy+y+4", "59x^2+4.5xy-2y-4=0"),
             new TestCaseData("x^2+3.5xy-y=2x^3+3.5xy-y", "-2x^3+x^2=0"),
             new TestCaseData("3.5x^9=6y^2-7z", "3.5x^9-6y^2+7z=0"),
