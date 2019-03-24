@@ -1,9 +1,11 @@
 ﻿using EquationsParser.Contracts;
 using EquationsParser.Logic;
 using System;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using EquationsParser.Exceptions;
 using EquationsParser.Models;
 
@@ -16,9 +18,11 @@ namespace EquationsParser
         private static ILogger _logger;
         private static ICalculator _calculator;
 
+        private static BlockingCollection<string> _equationsToProcess;
+
         private static CancellationTokenSource _cancellationSource;
 
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             _cancellationSource = new CancellationTokenSource();
 
@@ -35,11 +39,13 @@ namespace EquationsParser
                 new TermParser(new VariableParser(_logger), _logger),
                 new TermConverter(_logger),
                 _logger);
+
+            _equationsToProcess = new BlockingCollection<string>();
             
-            StartProgram();
+            await RunApp();
         }
 
-        private static void StartProgram()
+        private static Task RunApp()
         {
             IEquationsHandler equationsHandler;
 
@@ -55,26 +61,52 @@ namespace EquationsParser
                     throw new NotSupportedException($"{_config.ProgramMode} is not supported");
             }
 
-            foreach (var equation in equationsHandler.GetEquations(_cancellationSource.Token))
+            _ = Task.Run(() =>
             {
-                try
+                foreach (var equation in equationsHandler.GetEquations(_cancellationSource.Token))
                 {
-                    var result = _calculator.Calculate(equation);
-                    equationsHandler.OutputResult(result);
+                    _equationsToProcess.Add(equation);
                 }
-                catch (InvalidEquationException e)
+
+                _equationsToProcess.CompleteAdding();
+            });
+
+            return ProcessEquations(equationsHandler);
+        }
+
+        private static Task ProcessEquations(IEquationsHandler equationsHandler)
+        {
+            return Task.Run(async () =>
+            {
+                using (equationsHandler)
                 {
-                    _logger.Log(
-                        TraceLevel.Error,
-                        $"Equation parsing operation failed while processing {equation} ({e.Message})");
+                    foreach (var equation in _equationsToProcess.GetConsumingEnumerable())
+                    {
+                        try
+                        {
+                            var result = _calculator.Calculate(equation);
+                            await equationsHandler.OutputResultAsync(result);
+                        }
+                        catch (InvalidEquationException e)
+                        {
+                            _logger.Log(
+                                TraceLevel.Error,
+                                $"Equation parsing operation failed while processing {equation} ({e.Message})");
+                        }
+
+                        if (_equationsToProcess.IsCompleted &&
+                            _equationsToProcess.IsAddingCompleted)
+                        {
+                            break;
+                        }
+                    }
                 }
-            }
+            });
         }
 
         private static Config SetProgramConfig(string[] args)
         {
             var mode = ProgramMode.NotChosen;
-            string filepath = default;
 
             if (args.Length > 0)
             {
@@ -85,10 +117,6 @@ namespace EquationsParser
                         break;
                     case "-F":
                         mode = ProgramMode.FromFile;
-                        if (args.Length > 1)
-                        {
-                            filepath = args[1];
-                        }
                         break;
                 }
             }
@@ -108,7 +136,6 @@ namespace EquationsParser
                         break;
                     case ConsoleKey.F:
                         mode = ProgramMode.FromFile;
-                        filepath = SetInputFilename(args);
                         break;
                 }
             }
@@ -116,12 +143,17 @@ namespace EquationsParser
             return new Config
             {
                 ProgramMode = mode,
-                InputFilepath = filepath,
+                InputFilepath = SetInputFilename(args),
             };
         }
 
         private static string SetInputFilename(string[] args)
         {
+            if (args.Length > 1)
+            {
+                return args[1];
+            }
+
             string filepath = default;
 
             while (filepath == default)

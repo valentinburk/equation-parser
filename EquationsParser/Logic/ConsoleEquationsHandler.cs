@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using EquationsParser.Contracts;
 
 namespace EquationsParser.Logic
@@ -15,7 +16,7 @@ namespace EquationsParser.Logic
 
                 var line = Console.ReadLine();
 
-                if (line == "exit" || cancellationToken.IsCancellationRequested)
+                if (cancellationToken.IsCancellationRequested || line is null || line == "exit")
                 {
                     yield break;
                 }
@@ -24,9 +25,15 @@ namespace EquationsParser.Logic
             }
         }
 
-        public void OutputResult(string equation)
+        public Task OutputResultAsync(string equation)
         {
             Console.WriteLine($"Result: {equation}");
+
+            return Task.CompletedTask;
+        }
+
+        public void Dispose()
+        {
         }
     }
 }

@@ -1,12 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace EquationsParser.Contracts
 {
-    public interface IEquationsHandler
+    public interface IEquationsHandler : IDisposable
     {
         IEnumerable<string> GetEquations(CancellationToken cancellationToken = default);
 
-        void OutputResult(string equation);
+        Task OutputResultAsync(string equation);
     }
 }

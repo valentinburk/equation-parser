@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using EquationsParser.Contracts;
 
 namespace EquationsParser.Logic
@@ -12,7 +13,12 @@ namespace EquationsParser.Logic
             return Enumerable.Empty<string>();
         }
 
-        public void OutputResult(string equation)
+        public Task OutputResultAsync(string equation)
+        {
+            return Task.CompletedTask;
+        }
+
+        public void Dispose()
         {
         }
     }
