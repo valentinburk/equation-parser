@@ -27,11 +27,9 @@ namespace EquationsParser.Logic
                 TraceLevel.Info,
                 $"Start parsing term {term}");
 
-            Term result;
-
             // Match and assign all variables
             var regex = new Regex(@"[a-z](\^{1}-?[0-9]*(-?\.[0-9]+)?)?");
-            result.Variables = regex.Matches(term)
+            var variables = regex.Matches(term)
                 .Select(o => _variableParser.Parse(o.Value))
                 .ToArray();
 
@@ -47,7 +45,7 @@ namespace EquationsParser.Logic
                 1;
 
             // Assign multiplier
-            result.Multiplier = multipliers.Any() ?
+            var multiplier = multipliers.Any() ?
                 multipliers.Aggregate((a, b) => a * b) :
                 1 * sign;
 
@@ -55,7 +53,7 @@ namespace EquationsParser.Logic
                 TraceLevel.Info,
                 $"Term {term} has been parsed successfully");
 
-            return result;
+            return new Term(multiplier, variables);
         }
 
         private void ValidateTerm(string term)

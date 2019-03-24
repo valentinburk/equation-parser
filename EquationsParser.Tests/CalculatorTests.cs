@@ -13,7 +13,7 @@ namespace EquationsParser.Tests
     internal sealed class CalculatorTests
     {
         private static readonly string FakeValidString = nameof(FakeValidString);
-        private static readonly Term FakeValidTerm = new Term();
+        private static readonly Term FakeValidTerm = new Term(Array.Empty<Variable>());
 
         private static readonly TestCaseData[] InvalidEquations =
         {

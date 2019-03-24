@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using EquationsParser.Contracts;
+﻿using EquationsParser.Contracts;
 using EquationsParser.Exceptions;
 using EquationsParser.Models;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 
 namespace EquationsParser.Logic
 {
@@ -57,11 +57,7 @@ namespace EquationsParser.Logic
             // Add right side terms to resulting list
             foreach (var right in rightSide)
             {
-                AddToResult(terms, new Term
-                {
-                    Multiplier = right.Multiplier * -1,
-                    Variables = right.Variables
-                });
+                AddToResult(terms, right * -1);
             }
 
             var result = ConvertToCanonical(terms);

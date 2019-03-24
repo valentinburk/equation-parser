@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace EquationsParser.Models
 {
@@ -8,6 +10,17 @@ namespace EquationsParser.Models
 
         public Variable[] Variables;
 
+        public Term(IReadOnlyCollection<Variable> variables)
+            : this(1m, variables)
+        {
+        }
+
+        public Term(decimal multiplier, IReadOnlyCollection<Variable> variables)
+        {
+            Multiplier = multiplier;
+            Variables = variables.ToArray();
+        }
+
         public static Term operator+ (Term a, Term b)
         {
             Term result;
@@ -16,6 +29,20 @@ namespace EquationsParser.Models
             result.Variables = a.Variables;
 
             return result;
+        }
+
+        public static Term operator *(Term a, Term b)
+        {
+            return new Term(
+                a.Multiplier * b.Multiplier,
+                a.Variables.Union(b.Variables).ToArray());
+        }
+
+        public static Term operator *(Term term, int multiplier)
+        {
+            return new Term(
+                term.Multiplier * multiplier,
+                term.Variables);
         }
 
         public bool Equals(Term other)
