@@ -13,8 +13,6 @@ namespace EquationsParser.Tests.Integration
         private static readonly TestCaseData[] PositiveTestCases =
         {
             new TestCaseData("x+1=2", "x-1=0"),
-            new TestCaseData("x^+1=0", "x=0"),
-            new TestCaseData("+x = 0", "x=0"),
             new TestCaseData("25+2x=25+x", "x=0"),
             new TestCaseData("x^2+3.5xy-y=-58x^2-xy+y+4", "59x^2+4.5xy-2y-4=0"),
             new TestCaseData("x^2+3.5xy-y=2x^3+3.5xy-y", "-2x^3+x^2=0"),
@@ -34,6 +32,11 @@ namespace EquationsParser.Tests.Integration
             new TestCaseData("x^2ay^3bz^4c+2x=y^3z^4x^2abc-2x", "4x=0"),    // Variables int different order. Should work correctly
             new TestCaseData("3.5x^3.5=y^1.96", "3.5x^3.5-y^1.96=0"),       // Floatint point number in power. Should work correctly
             new TestCaseData("3.5x^-3.5=y^-1.96", "3.5x^-3.5-y^-1.96=0"),   // Negative numbers in power. Should work correctly
+            new TestCaseData("3.5x^+9=6y^+2-7z", "3.5x^9-6y^2+7z=0"),       // Explicitly specified the positive power. Should work correctly
+            new TestCaseData("19y^+7x+6y=-y^+7x-0.12", "20y^7x+0.12+6y=0"), // Explicitly specified the positive power. Should work correctly
+            new TestCaseData("x^+1=0", "x=0"),                              // Explicitly specified the positive power. Should work correctly
+            new TestCaseData("+x=0", "x=0"),                                // Explicitly specified the first positive summand. Should work correctly
+            new TestCaseData("+7x=+6x", "x=0"),                             // Explicitly specified the first positive summand. Should work correctly
         };
 
         private static readonly TestCaseData[] InvalidTestCases =
