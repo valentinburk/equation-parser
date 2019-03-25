@@ -1,6 +1,6 @@
 ﻿namespace EquationsParser.Contracts
 {
-    public interface ICalculator
+    internal interface ICalculator
     {
         string Calculate(string equation);
     }

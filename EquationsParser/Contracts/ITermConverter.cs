@@ -2,7 +2,7 @@
 
 namespace EquationsParser.Contracts
 {
-    public interface ITermConverter
+    internal interface ITermConverter
     {
         string ToCanonical(Term term);
     }

@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace EquationsParser.Models
 {
-    public struct Term : IEquatable<Term>
+    internal struct Term : IEquatable<Term>
     {
         public decimal Multiplier;
 

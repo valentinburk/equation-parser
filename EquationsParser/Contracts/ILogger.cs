@@ -2,7 +2,7 @@
 
 namespace EquationsParser.Contracts
 {
-    public interface ILogger
+    internal interface ILogger
     {
         void Log(TraceLevel level, string info);
     }

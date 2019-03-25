@@ -2,7 +2,7 @@
 
 namespace EquationsParser.Models
 {
-    public struct Variable : IEquatable<Variable>
+    internal struct Variable : IEquatable<Variable>
     {
         public char Letter;
 

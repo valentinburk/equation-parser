@@ -2,7 +2,7 @@
 
 namespace EquationsParser.Contracts
 {
-    public interface IVariableParser
+    internal interface IVariableParser
     {
         Variable Parse(string variable);
     }

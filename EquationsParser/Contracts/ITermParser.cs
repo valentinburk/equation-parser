@@ -2,7 +2,7 @@
 
 namespace EquationsParser.Contracts
 {
-    public interface ITermParser
+    internal interface ITermParser
     {
         Term Parse(string term);
     }

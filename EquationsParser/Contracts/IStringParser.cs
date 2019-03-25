@@ -2,7 +2,7 @@
 
 namespace EquationsParser.Contracts
 {
-    public interface IStringParser
+    internal interface IStringParser
     {
         string[] Parse(string origin, IReadOnlyCollection<char> delimiters = default);
     }

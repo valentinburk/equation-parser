@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace EquationsParser.Contracts
 {
-    public interface IAppRunner
+    internal interface IAppRunner
     {
         Task RunAppAsync(CancellationToken cancellationToken = default);
     }

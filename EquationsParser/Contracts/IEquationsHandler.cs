@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace EquationsParser.Contracts
 {
-    public interface IEquationsHandler : IDisposable
+    internal interface IEquationsHandler : IDisposable
     {
         IEnumerable<string> GetEquations(CancellationToken cancellationToken = default);
 
