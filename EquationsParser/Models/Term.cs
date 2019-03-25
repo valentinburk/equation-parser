@@ -21,7 +21,7 @@ namespace EquationsParser.Models
             Variables = variables.ToArray();
         }
 
-        public static Term operator+ (Term a, Term b)
+        public static Term operator + (Term a, Term b)
         {
             Term result;
 
@@ -31,7 +31,7 @@ namespace EquationsParser.Models
             return result;
         }
 
-        public static Term operator *(Term term, int multiplier)
+        public static Term operator * (Term term, int multiplier)
         {
             return new Term(
                 term.Multiplier * multiplier,
