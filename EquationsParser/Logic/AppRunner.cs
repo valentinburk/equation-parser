@@ -65,8 +65,14 @@ namespace EquationsParser.Logic
                     catch (InvalidEquationException e)
                     {
                         _logger.Log(
-                            TraceLevel.Error,
+                            TraceLevel.Warning,
                             $"Equation parsing operation failed while processing {equation} ({e.Message})");
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.Log(
+                            TraceLevel.Error,
+                            $"Unknown error: {e.Message}");
                     }
 
                     if (_equationsToProcess.IsCompleted &&

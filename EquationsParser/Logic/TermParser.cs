@@ -28,7 +28,7 @@ namespace EquationsParser.Logic
                 $"Start parsing term {term}");
 
             // Match and assign all variables
-            var regex = new Regex(@"[a-z](\^{1}-?[0-9]*(-?\.[0-9]+)?)?");
+            var regex = new Regex(@"[a-z](\^{1}[-+]?[0-9]*(-?\.[0-9]+)?)?");
             var variables = regex.Matches(term)
                 .Select(o => _variableParser.Parse(o.Value))
                 .ToArray();

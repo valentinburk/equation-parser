@@ -1,10 +1,9 @@
-﻿using System;
-using EquationsParser.Contracts;
+﻿using EquationsParser.Contracts;
 using EquationsParser.Exceptions;
 using EquationsParser.Logic;
-using NSubstitute;
 using NUnit.Framework;
 using Shouldly;
+using System;
 
 namespace EquationsParser.Tests.Integration
 {
@@ -13,6 +12,9 @@ namespace EquationsParser.Tests.Integration
     {
         private static readonly TestCaseData[] PositiveTestCases =
         {
+            new TestCaseData("x+1=2", "x-1=0"),
+            new TestCaseData("x^+1=0", "x=0"),
+            new TestCaseData("+x = 0", "x=0"),
             new TestCaseData("25+2x=25+x", "x=0"),
             new TestCaseData("x^2+3.5xy-y=-58x^2-xy+y+4", "59x^2+4.5xy-2y-4=0"),
             new TestCaseData("x^2+3.5xy-y=2x^3+3.5xy-y", "-2x^3+x^2=0"),

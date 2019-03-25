@@ -127,7 +127,9 @@ namespace EquationsParser.Logic
                 throw new InvalidEquationException("Equation doesn't have terms on both sides");
             }
 
-            return sides;
+            return sides
+                .Select(side => side.TrimStart('+'))
+                .ToArray();
         }
     }
 }

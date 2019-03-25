@@ -1,8 +1,8 @@
-﻿using System;
+﻿using EquationsParser.Contracts;
+using EquationsParser.Models;
+using System;
 using System.Diagnostics;
 using System.Text;
-using EquationsParser.Contracts;
-using EquationsParser.Models;
 
 namespace EquationsParser.Logic
 {
@@ -32,7 +32,7 @@ namespace EquationsParser.Logic
             builder.Append(term.Multiplier > 0 ? '+' : '-');
 
             var absMultiplier = Math.Abs(term.Multiplier);
-            if (absMultiplier != 1)
+            if (term.Variables.Length == 0 || absMultiplier != 1)
             {
                 builder.Append(absMultiplier);
             }
