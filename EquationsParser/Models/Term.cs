@@ -31,13 +31,6 @@ namespace EquationsParser.Models
             return result;
         }
 
-        public static Term operator *(Term a, Term b)
-        {
-            return new Term(
-                a.Multiplier * b.Multiplier,
-                a.Variables.Union(b.Variables).ToArray());
-        }
-
         public static Term operator *(Term term, int multiplier)
         {
             return new Term(
